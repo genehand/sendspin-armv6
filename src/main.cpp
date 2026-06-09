@@ -163,11 +163,6 @@ int main(int argc, char* argv[]) {
             sink.clear();
         }
 
-        void on_stream_clear() override {
-            fprintf(stderr, ">>> Stream clear\n");
-            sink.clear();
-        }
-
         void on_volume_changed(uint8_t vol) override { sink.set_volume(vol); }
         void on_mute_changed(bool muted) override { sink.set_muted(muted); }
         void on_static_delay_changed(uint16_t delay_ms) override {

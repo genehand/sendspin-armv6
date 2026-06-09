@@ -18,7 +18,7 @@ set(SENDSPIN_ENABLE_VISUALIZER OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     sendspin-cpp
     GIT_REPOSITORY https://github.com/Sendspin/sendspin-cpp.git
-    GIT_TAG        v0.4.0
+    GIT_TAG        v0.6.1
     GIT_SHALLOW    TRUE
     EXCLUDE_FROM_ALL  # do not build sendspin-cpp's own examples
 )
