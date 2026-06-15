@@ -57,6 +57,19 @@ bool load_config(const std::string& path, Config& config) {
                 fprintf(stderr, "%s:%d: invalid initial_volume value '%s', ignoring\n",
                         path.c_str(), line_num, value.c_str());
             }
+        } else if (key == "initial_static_delay") {
+            try {
+                int v = std::stoi(value);
+                if (v < 0 || v > 5000) {
+                    fprintf(stderr, "%s:%d: initial_static_delay must be 0-5000 (ms), ignoring\n",
+                            path.c_str(), line_num);
+                } else {
+                    config.initial_static_delay_ms = v;
+                }
+            } catch (const std::exception&) {
+                fprintf(stderr, "%s:%d: invalid initial_static_delay value '%s', ignoring\n",
+                        path.c_str(), line_num, value.c_str());
+            }
         } else {
             fprintf(stderr, "%s:%d: unknown key '%s'\n", path.c_str(), line_num,
                     key.c_str());

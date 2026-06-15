@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
     SendspinClient client(std::move(client_config));
 
     // Add player role with supported audio formats
-    PlayerRole::Config player_config;
+    PlayerRoleConfig player_config;
     player_config.audio_formats = {
         {SendspinCodecFormat::FLAC, 2, 44100, 16},
         {SendspinCodecFormat::FLAC, 2, 48000, 16},
@@ -124,6 +124,10 @@ int main(int argc, char* argv[]) {
     // playback time already accounts for the hardware buffer.  No additional
     // fixed delay compensation is required.
     player_config.fixed_delay_us = AlsaPipeSink::PIPELINE_DELAY_US;
+    if (cfg.initial_static_delay_ms >= 0) {
+        player_config.initial_static_delay_ms =
+            static_cast<uint16_t>(cfg.initial_static_delay_ms);
+    }
     auto& player = client.add_player(std::move(player_config));
 
     // Audio output via aplay pipe
@@ -159,13 +163,11 @@ int main(int argc, char* argv[]) {
             sink.clear();
         }
 
-        void on_stream_clear() override {
-            fprintf(stderr, ">>> Stream clear\n");
-            sink.clear();
-        }
-
         void on_volume_changed(uint8_t vol) override { sink.set_volume(vol); }
         void on_mute_changed(bool muted) override { sink.set_muted(muted); }
+        void on_static_delay_changed(uint16_t delay_ms) override {
+            fprintf(stderr, ">>> Static delay changed to %u ms\n", delay_ms);
+        }
     };
 
     struct ArmClientListener : SendspinClientListener {
@@ -189,6 +191,7 @@ int main(int argc, char* argv[]) {
     HostNetworkProvider network_provider;
 
     player.set_listener(&player_listener);
+    player.set_static_delay_adjustable(true);
     client.set_listener(&client_listener);
     client.set_network_provider(&network_provider);
 
